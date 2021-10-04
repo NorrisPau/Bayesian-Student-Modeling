@@ -5,27 +5,8 @@
 
 import pandas as pd
 import numpy as np
-
-# Load dataset: ASSESment Data 2009-2010
-data = pd.read_csv('skill_builder_data_2009_2010_ASSISTment_Data.csv', index_col=0)
-print(data)
-data.head()
-data_student = data[["user_id", "problem_id", "skill_id", "skill_name", "correct", "opportunity"]]
-print(data_student)
-V = data_student["correct"].values
-
-# Look at 1 student and 1 Skill: Ordering Integers
-is_student_1 = data_student['user_id'] == 64525  # boolean
-student_1 = data_student[is_student_1]  # subset with boolean
-student_1.head()
-len(student_1)  # 800 exercises
-s = student_1.groupby("skill_name")
-s.first()
-student_1_ordering = student_1[student_1["skill_name"] == "Ordering Integers"]
-student_1_ordering.head()
-len(student_1_ordering) #39 observations of the skillset Ordering Integers
-
-V_student = student_1_ordering["correct"].values
+import random
+random.seed(30)
 
 ### 0. Initialize A (Transition Probabilities) and B (Emission Probabilities)
 p_transit = 0.1
@@ -48,32 +29,39 @@ b = np.array(((1 - p_slip, p_slip),
 # Generate Data:
 ## Based on Prior, Transition and Emission Probabilites, we sample corresponding hidden states of having mastered the skill
 #1. Generate Hidden State MASTERED
-import random
+
 hidden_states = [0, 1]
-# would need a different initial_hidden_weight = [] for beginning
-hidden_weights = [1-p_transit, p_transit] # mastered -> not mastered, not mastered -> mastered
+# Note: would need a different initial_hidden_weight = [] for beginning
+hidden_weights = [1-p_transit, p_transit] # mastered -> not mastered: (0.9), not mastered -> mastered: (0.1)
 mastered_rnd = random.choices(hidden_states, hidden_weights, k=20)
 
 #Generate Observed State CORRECT
 correct_elements = [0, 1]
-correct = []
+correct_generated = []
 #1. if mastered: 1-p(slip) = correct
-correct_weights_mastered = [p_slip, 1-p_slip] #incorrect, correct
+correct_weights_mastered = [p_slip, 1-p_slip] #incorrect (0.3), correct (0.7)
 #2. #if not mastered: p(guess) = correct
-correct_weights_notmastered = [1-p_guess, p_guess]
+correct_weights_notmastered = [1-p_guess, p_guess] #incorrect: 0.8, correct: 0.2
 
 for i in mastered_rnd:
     if i == 1:
-        correct += (random.choices(correct_elements, correct_weights_mastered, k=1))
+        correct_generated += (random.choices(correct_elements, correct_weights_mastered, k=1))
     elif i == 0:
-        correct += (random.choices(correct_elements, correct_weights_notmastered, k=1))
+        correct_generated += (random.choices(correct_elements, correct_weights_notmastered, k=1))
 
 ## TODO: QUESTION: How to generate data based on emission and transition probability? To account for all options (See notes)?
 # Because for instance mastered - mastered has a probability  of 1, not 0.1 because we calculate no forgetting here?
 
+#Put together in dataframe
+data = pd.DataFrame(
+    {'Hidden': mastered_rnd,
+     'Visible': correct_generated})
+V = data['Visible'].values
+
 
 # Recursive dynamic programming = Forward and Backward Algorithm
 ### 1. Forward Algorithm
+
 def forward(V, a, b, initial_distribution):
     alpha = np.zeros((V.shape[0], a.shape[0]))
     alpha[0, :] = initial_distribution * b[:, V[0]]  # choose 2. column, all rows
@@ -140,6 +128,6 @@ def baum_welch(V, a, b, initial_distribution, n_iter=100):
     return {"a": a, "b": b}
 
 
-print(baum_welch(V, a, b, initial_distribution, n_iter=100))
+
 
 # Could do: Validate Result with hmm package, split in train and test data?
