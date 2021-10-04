@@ -10,43 +10,73 @@ import numpy as np
 data = pd.read_csv('skill_builder_data_2009_2010_ASSISTment_Data.csv', index_col=0)
 print(data)
 data.head()
-data_student = data[["user_id", "problem_id", "skill_id", "skill_name", "correct"]]
+data_student = data[["user_id", "problem_id", "skill_id", "skill_name", "correct", "opportunity"]]
 print(data_student)
 V = data_student["correct"].values
 
-# Look at 1 student
+# Look at 1 student and 1 Skill: Ordering Integers
 is_student_1 = data_student['user_id'] == 64525  # boolean
 student_1 = data_student[is_student_1]  # subset with boolean
 student_1.head()
 len(student_1)  # 800 exercises
 s = student_1.groupby("skill_name")
 s.first()
-V_student = student_1["correct"].values
+student_1_ordering = student_1[student_1["skill_name"] == "Ordering Integers"]
+student_1_ordering.head()
+len(student_1_ordering) #39 observations of the skillset Ordering Integers
 
-# TODO: Question: How do we know time parameter of each exercise? Do we group by skill and order id is in time order ?
+V_student = student_1_ordering["correct"].values
 
 ### 0. Initialize A (Transition Probabilities) and B (Emission Probabilities)
 p_transit = 0.1
 p_slip = 0.3
 p_guess = 0.2
 
-# Initial Probilities
+# Initial Probabilities
 initial_distribution = np.array((0.4, 0.6))  # knows before, doesn't know before
 
 # Transition Probabilities
 # 1. #mastered - mastered, not mastered - mastered (forget)
-a = np.array(((1, 0), (p_transit, 1 - p_transit)))
+a = np.array(((1, 0),
+              (p_transit, 1 - p_transit)))
 
 # Emission Probabilities
 # 1. mastered - correct, not mastered - incorrect, not mastered - correct, not mastered - incorrect
-b = np.array(((1 - p_slip, p_slip), (p_guess, 1 - p_guess)))
+b = np.array(((1 - p_slip, p_slip),
+              (p_guess, 1 - p_guess)))
+
+# Generate Data:
+## Based on Prior, Transition and Emission Probabilites, we sample corresponding hidden states of having mastered the skill
+#1. Generate Hidden State MASTERED
+import random
+hidden_states = [0, 1]
+# would need a different initial_hidden_weight = [] for beginning
+hidden_weights = [1-p_transit, p_transit] # mastered -> not mastered, not mastered -> mastered
+mastered_rnd = random.choices(hidden_states, hidden_weights, k=20)
+
+#Generate Observed State CORRECT
+correct_elements = [0, 1]
+correct = []
+#1. if mastered: 1-p(slip) = correct
+correct_weights_mastered = [p_slip, 1-p_slip] #incorrect, correct
+#2. #if not mastered: p(guess) = correct
+correct_weights_notmastered = [1-p_guess, p_guess]
+
+for i in mastered_rnd:
+    if i == 1:
+        correct += (random.choices(correct_elements, correct_weights_mastered, k=1))
+    elif i == 0:
+        correct += (random.choices(correct_elements, correct_weights_notmastered, k=1))
+
+## TODO: QUESTION: How to generate data based on emission and transition probability? To account for all options (See notes)?
+# Because for instance mastered - mastered has a probability  of 1, not 0.1 because we calculate no forgetting here?
 
 
 # Recursive dynamic programming = Forward and Backward Algorithm
 ### 1. Forward Algorithm
 def forward(V, a, b, initial_distribution):
     alpha = np.zeros((V.shape[0], a.shape[0]))
-    alpha[0, :] = initial_distribution * b[:, V[0]]  # choose 2. column, all rows #TODO: What does V[0] make here?
+    alpha[0, :] = initial_distribution * b[:, V[0]]  # choose 2. column, all rows
 
     for t in range(1, V.shape[0]):
         for j in range(a.shape[0]):
