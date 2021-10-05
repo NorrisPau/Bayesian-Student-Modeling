@@ -35,8 +35,11 @@ df = pd.DataFrame(
     {'Hidden': hidden_generated,
      'Visible': V_student})
 
-#Calculate Emisson and Transition Probability based on generated dataset
+#Calculate Emission and Transition Probability based on generated dataset
 #1. Emission
+total_mastered = hidden_generated.count(1)
+total_not_mastered = hidden_generated.count(0)
+
 mastered_mastered = []
 mastered_not_mastered = []
 not_mastered_not_mastered = []
@@ -52,10 +55,10 @@ for i in range(len(hidden_generated)-1): #because for last element no emission p
     elif hidden_generated[i] == 0 and hidden_generated[i+1] == 1:
         not_mastered_mastered += "1"
 
-mastered_not_mastered = len(mastered_not_mastered)/39 #9
-mastered_mastered = len(mastered_mastered)/39 #17
-not_mastered_mastered = len(not_mastered_mastered)/39 #9
-not_mastered_not_mastered = len(not_mastered_not_mastered)/39 #3
+mastered_not_mastered = len(mastered_not_mastered)/total_not_mastered #9
+mastered_mastered = len(mastered_mastered)/total_mastered #17
+not_mastered_mastered = len(not_mastered_mastered)/total_mastered #9
+not_mastered_not_mastered = len(not_mastered_not_mastered)/total_not_mastered #3
 
 emission = np.array(((mastered_mastered, mastered_not_mastered),
               (not_mastered_mastered, not_mastered_not_mastered)))
@@ -76,10 +79,10 @@ for i in range(len(V_student)):
     if hidden_generated[i] == 0 and V_student[i] == 0:
         not_mastered_incorrect += "1"
 
-mastered_correct = len(mastered_correct)/39
-not_mastered_correct = len(not_mastered_correct)/39
-mastered_incorrect = len(mastered_incorrect)/39
-not_mastered_incorrect = len(not_mastered_incorrect)/39
+mastered_correct = len(mastered_correct)/total_mastered
+not_mastered_correct = len(not_mastered_correct)/total_not_mastered
+mastered_incorrect = len(mastered_incorrect)/total_mastered
+not_mastered_incorrect = len(not_mastered_incorrect)/total_not_mastered
 
 transition = np.array(((mastered_correct, mastered_incorrect),
               (not_mastered_correct, not_mastered_incorrect)))
@@ -160,7 +163,7 @@ def baum_welch(V_student, transition, emission, initial_distribution, n_iter=100
 
 transition
 emission
-print(baum_welch(V_student, transition, emission, initial_distribution_generated, n_iter=100))
+print(baum_welch(V_student, transition, emission, initial_distribution_generated, n_iter=1000))
 #Result: The algorithm comes to different results, only parts are pretty close like 2nd row of b (emission)
 
 
