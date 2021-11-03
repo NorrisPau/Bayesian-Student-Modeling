@@ -167,3 +167,10 @@ print(baum_welch(V_student, transition, emission, initial_distribution_generated
 #Result: The algorithm comes to different results, only parts are pretty close like 2nd row of b (emission)
 
 
+#Komplett Daten selbst generieren
+#erste 20 items not mastered, 21-30 mastered
+#based on this: incorrect/correct
+#mehr correct/incorrect sequence- better evaluation
+
+#wie groß ist fehler abhängig menge an daten - Lernpfad/trajectory
+
