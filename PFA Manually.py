@@ -31,7 +31,7 @@ print(test_df)
 # train_student = train_df[(train_df["user_id"] == "0")]
 
 #Formula:
-#Question: Do I need S and K individually or is "correct" covering both as a binary variable?
+#Question: Do I need S and K individually or is "correct" covering both as a binary variable? And is beta the intercept included automatically?
 #S_k = number of correctly solved tasks
 S_train = train_df[(train_df["correct"] == "1")]
 S_test = test_df[(train_df["correct"] == "1")]
@@ -40,9 +40,10 @@ F_train = train_df[(train_df["correct"] == "0")]
 F_test = test_df[(train_df["correct"] == "0")]
 
 
-feature_cols = ['pregnant', 'insulin', 'bmi', 'age','glucose','bp','pedigree']
-X = pima[feature_cols] # Features
-y = pima.label # Target variable
+#feature_cols = ['S_train', 'F_train']
+#X_train = train_df[feature_cols] # Features
+#X_test = test_df[feature_cols]
+#y = train_df. ???? # Target variable
 #Target variable = Accumulated learning? Question: We don't know the target, how to compute it then? What do we subset?
 #Simulate it?
 
