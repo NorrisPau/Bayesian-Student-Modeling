@@ -39,11 +39,12 @@ S_test = test_df[(train_df["correct"] == "1")]
 F_train = train_df[(train_df["correct"] == "0")]
 F_test = test_df[(train_df["correct"] == "0")]
 
+#m_train =
 
 #feature_cols = ['S_train', 'F_train']
 #X_train = train_df[feature_cols] # Features
 #X_test = test_df[feature_cols]
-#y = train_df. ???? # Target variable
+#y = train_df. ???? # Target variable: Correct 
 #Target variable = Accumulated learning? Question: We don't know the target, how to compute it then? What do we subset?
 #Simulate it?
 
