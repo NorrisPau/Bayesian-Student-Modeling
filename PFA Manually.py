@@ -48,7 +48,21 @@ for index, row in df_student_skill.iterrows():
         print(row["prior_successes"][index-1])
 
 """
+
+#TODO: Change this code
+student_ids = train_df['student_id'].unique()
+
+
+processed_df = pd.DataFrame()
+for student_id in student_ids:
+    for skill_id in skill_ids:
+        filtered_df = train_df[train_df['skill_id'] == skill_id & train_df['skill_id'] == skill_id]
+        # apply function to calculate prior successes/failures
+
+        # add calculation results to processed_df
+
 for index in df_student_skill.index:
+    print(df_student_skill.iloc[0:index]["prior_failures"].count())
     print("number of iteration is", index)
     if df_student_skill.loc[index,'correct'] == 1:
         df_student_skill.loc[index, 'prior_successes'] = df_student_skill.iloc[0:index]["correct"].sum() + 1
@@ -65,7 +79,13 @@ print(df_student_skill.iloc[0:3].sum())
 # print(df_student_skill.loc[df_student_skill["correct"] == "0"].sum())
 
 
+#von pandas zu numpy array:
+#select spalten, die ich brauche
+df_student_skill.values
+#log regression: OUtput = correct, Input = success, failures
 
+
+"""
 for index in df_student_skill.index:
     print("number of iteration is", index)
     if df_student_skill.loc[index,'correct'] == 1:
@@ -74,7 +94,7 @@ for index in df_student_skill.index:
     elif df_student_skill.loc[index, "correct"] == 0:
         df_student_skill.loc[index, "prior_failures"] = df_student_skill.loc[index, "prior_failures"] + 1
 
-
+"""
 
 #S_k = number of correctly solved tasks
 #S_train = train_df[(train_df["correct"] == "1")]
