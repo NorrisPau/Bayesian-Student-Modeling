@@ -2,7 +2,6 @@
 # See http://pact.cs.cmu.edu/koedinger/pubs/AIED%202009%20final%20Pavlik%20Cen%20Keodinger%20corrected.pdf
 # Code found in: https://github.com/theophilee/learner-performance-prediction, train_lr.py
 
-# TODO: Question -> How do I import functions from other script? This gives an error
 from PerformanceFactorAnalysis_BayesianKnowledgeTracing import compute_metrics
 
 import argparse
@@ -49,52 +48,46 @@ for index, row in df_student_skill.iterrows():
 
 """
 
-#TODO: Change this code
-student_ids = train_df['student_id'].unique()
+#TODO: Interate over student ids and skill ids
+#1. Loop over student ids and skill ids
+#2. make Loop correct to fill in prior failures
+#3. put all together
 
+student_ids = train_df['user_id'].unique()
+skill_ids = train_df["skill_id"].unique()
 
+"""
 processed_df = pd.DataFrame()
 for student_id in student_ids:
     for skill_id in skill_ids:
         filtered_df = train_df[train_df['skill_id'] == skill_id & train_df['skill_id'] == skill_id]
         # apply function to calculate prior successes/failures
 
-        # add calculation results to processed_df
+        # add calculation results to processed_df"""
+
 
 for index in df_student_skill.index:
-    print(df_student_skill.iloc[0:index]["prior_failures"].count())
+    #print(df_student_skill.iloc[0:index]["prior_failures"].count())
     print("number of iteration is", index)
     if df_student_skill.loc[index,'correct'] == 1:
         df_student_skill.loc[index, 'prior_successes'] = df_student_skill.iloc[0:index]["correct"].sum() + 1
 
     elif df_student_skill.loc[index, "correct"] == 0:
-        df_student_skill.loc[index, "prior_failures"] = df_student_skill.iloc[0:index]["prior_failures"].sum() + 1
-
-#TODO: Question: How to sum over all rows where correct = 0 and indexing [0:index]???
-print(df_student_skill.iloc[0:3].sum())
-
-
-# print(df_student_skill.loc[df_student_skill["correct"].isin(["1"]), "correct"].sum())
-# df_student_skill.iloc[0:index]["prior_failures"].sum()
-# print(df_student_skill.loc[df_student_skill["correct"] == "0"].sum())
+        len = index
+        #df_student_skill.loc[index, "prior_failures"] = (df_student_skill.iloc[0:index]["correct"].sum())-len + 1
+        df_student_skill.loc[index, "prior_failures"] = (len+1) - df_student_skill.iloc[0:index]["correct"].sum()
 
 
+
+#TODO: Implement logistic Regression for PFA
+
+
+#Note:
 #von pandas zu numpy array:
 #select spalten, die ich brauche
-df_student_skill.values
+#df_student_skill.values
 #log regression: OUtput = correct, Input = success, failures
 
-
-"""
-for index in df_student_skill.index:
-    print("number of iteration is", index)
-    if df_student_skill.loc[index,'correct'] == 1:
-        df_student_skill.loc[index, 'prior_successes'] = df_student_skill.loc[index, "prior_successes"] + 1
-
-    elif df_student_skill.loc[index, "correct"] == 0:
-        df_student_skill.loc[index, "prior_failures"] = df_student_skill.loc[index, "prior_failures"] + 1
-
-"""
 
 #S_k = number of correctly solved tasks
 #S_train = train_df[(train_df["correct"] == "1")]
@@ -118,7 +111,6 @@ for index in df_student_skill.index:
 
 
 """
-
 # X = data (correct/incorrect)
 #X_train = train_df["correct"]
 #X_test = test_df["correct"]
