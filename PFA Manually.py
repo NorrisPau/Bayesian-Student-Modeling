@@ -45,7 +45,6 @@ for index, row in df_student_skill.iterrows():
     if row["correct"] == 1:
         row["prior_successes"] = row["prior_successes"] + 1
         print(row["prior_successes"][index-1])
-
 """
 
 #TODO: Interate over student ids and skill ids
@@ -80,9 +79,6 @@ for index in df_student_skill.index:
 
 
 #TODO: Implement logistic Regression for PFA
-
-
-#Note:
 #von pandas zu numpy array:
 #select spalten, die ich brauche
 #df_student_skill.values
